@@ -88,24 +88,42 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
+
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
     ############################################################
     # problem = Class PositionSearchProblem in searchAgents.py #
     ############################################################
-
+    from game import Directions
+    s = Directions.SOUTH
+    w = Directions.WEST
+    n = Directions.NORTH
+    e = Directions.EAST
     closed = set() # keeps track of visited nodes
     fringe = util.Stack()
-    # push the starting state onto the stack.
-    fringe.push(problem) 
+    
+    # Prepare the start node
+    startState = problem.getStartState
+    path = []
+    cost = 0
+    node = (startState, path, cost)
+    
+    # Push the start node onto the fringe
+    fringe.push(node) 
 
     while not fringe.isEmpty():
-        current = fringe.pop()
-        if problem.isGoalState(current.getStartState()):
+        currentNode = fringe.pop()
+        if problem.isGoalState(currentNode[1]):
             # This is a goal state, return the path!
-            return
-        if current not in closed:
-            closed.add(current)
-            successors = current.getSuccessors(current.getStartState())
+            return currentNode[2]
+        if currentNode not in closed:
+            closed.add(currentNode)
+            successors = currentNode.getSuccessors(currentNode.getStartState())
             for child in successors:
+                child = (child[1], currentNode[2] + child[2], currentNode[3] + child[3])
                 fringe.push(child)
 
     util.raiseNotDefined()
