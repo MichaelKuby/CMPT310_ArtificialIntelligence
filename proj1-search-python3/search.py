@@ -88,55 +88,133 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-
     ############################################################
     # problem = Class PositionSearchProblem in searchAgents.py #
     ############################################################
-    from game import Directions
-    s = Directions.SOUTH
-    w = Directions.WEST
-    n = Directions.NORTH
-    e = Directions.EAST
-    closed = set() # keeps track of visited nodes
+
+    visited = []  # keeps track of visited nodes
     fringe = util.Stack()
-    
+
     # Prepare the start node
-    startState = problem.getStartState
-    path = []
-    cost = 0
-    node = (startState, path, cost)
-    
+    parent = None
+    start_position = problem.getStartState()
+    start_path = []
+    start_cost = 0
+
+    node = {
+        "path": start_path,
+        "vertex": start_position,
+        "cost": start_cost
+    }
+
     # Push the start node onto the fringe
-    fringe.push(node) 
+    fringe.push(node)
 
     while not fringe.isEmpty():
-        currentNode = fringe.pop()
-        if problem.isGoalState(currentNode[1]):
-            # This is a goal state, return the path!
-            return currentNode[2]
-        if currentNode not in closed:
-            closed.add(currentNode)
-            successors = currentNode.getSuccessors(currentNode.getStartState())
+        current_node = fringe.pop()
+        if problem.isGoalState(current_node["vertex"]):
+            # This is a goal state, return the path.
+            return current_node["path"]
+        if current_node["vertex"] not in visited:
+            visited.append(current_node["vertex"])
+            successors = problem.getSuccessors(current_node["vertex"])
             for child in successors:
-                child = (child[1], currentNode[2] + child[2], currentNode[3] + child[3])
-                fringe.push(child)
-
-    util.raiseNotDefined()
+                child_node = {
+                        "path": current_node["path"].copy() + [child[1]],
+                        "vertex": child[0],
+                        "cost": current_node["cost"] + child[2]
+                    }
+                if child_node["vertex"] not in visited:
+                    fringe.push(child_node)
+    print("No solution found")
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    ############################################################
+    # problem = Class PositionSearchProblem in searchAgents.py #
+    ############################################################
+
+    visited = []  # keeps track of visited nodes
+    fringe = util.Queue()
+
+    # Prepare the start node
+    parent = None
+    start_position = problem.getStartState()
+    start_path = []
+    start_cost = 0
+
+    node = {
+        "path": start_path,
+        "vertex": start_position,
+        "cost": start_cost
+    }
+
+    # Push the start node onto the fringe
+    fringe.push(node)
+
+    while not fringe.isEmpty():
+        current_node = fringe.pop()
+        if problem.isGoalState(current_node["vertex"]):
+            # This is a goal state, return the path.
+            return current_node["path"]
+        if current_node["vertex"] not in visited:
+            visited.append(current_node["vertex"])
+            successors = problem.getSuccessors(current_node["vertex"])
+            for child in successors:
+                child_node = {
+                        "path": current_node["path"].copy() + [child[1]],
+                        "vertex": child[0],
+                        "cost": current_node["cost"] + child[2]
+                    }
+                if child_node["vertex"] not in visited:
+                    fringe.push(child_node)
+    print("No solution found")
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    ############################################################
+    # problem = Class PositionSearchProblem in searchAgents.py #
+    ############################################################
+
+    visited = []  # keeps track of visited nodes
+    fringe = util.PriorityQueue()
+
+    # Prepare the start node
+    parent = None
+    start_position = problem.getStartState()
+    start_path = []
+    start_cost = 0
+
+    node = {
+        "path": start_path,
+        "vertex": start_position,
+        "cost": start_cost
+    }
+
+    # Push the start node onto the fringe
+    fringe.push(node, node["cost"])
+
+    while not fringe.isEmpty():
+        current_node = fringe.pop()
+        if problem.isGoalState(current_node["vertex"]):
+            # This is a goal state, return the path.
+            return current_node["path"]
+        if current_node["vertex"] not in visited:
+            visited.append(current_node["vertex"])
+            successors = problem.getSuccessors(current_node["vertex"])
+            for child in successors:
+                child_node = {
+                        "path": current_node["path"].copy() + [child[1]],
+                        "vertex": child[0],
+                        "cost": current_node["cost"] + child[2]
+                    }
+                if child_node["vertex"] not in visited:
+                    fringe.push(child_node, child_node["cost"])
+    print("No solution found")
 
 def nullHeuristic(state, problem=None):
     """
@@ -148,7 +226,46 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    ############################################################
+    # problem = Class PositionSearchProblem in searchAgents.py #
+    ############################################################
+
+    visited = []  # keeps track of visited nodes
+    fringe = util.PriorityQueue()
+
+    # Prepare the start node
+    parent = None
+    start_position = problem.getStartState()
+    start_path = []
+    start_cost = 0
+
+    node = {
+        "path": start_path,
+        "vertex": start_position,
+        "cost": start_cost
+    }
+
+    # Push the start node onto the fringe
+    fringe.push(node, heuristic(node["vertex"], problem) + node["cost"])
+
+    while not fringe.isEmpty():
+        current_node = fringe.pop()
+        if problem.isGoalState(current_node["vertex"]):
+            # This is a goal state, return the path.
+            return current_node["path"]
+        if current_node["vertex"] not in visited:
+            visited.append(current_node["vertex"])
+            successors = problem.getSuccessors(current_node["vertex"])
+            for child in successors:
+                child_node = {
+                        "path": current_node["path"].copy() + [child[1]],
+                        "vertex": child[0],
+                        "cost": current_node["cost"] + child[2]
+                    }
+                if child_node["vertex"] not in visited:
+                    fringe.push(child_node, heuristic(child_node["vertex"], problem) + child_node["cost"])
+    print("No solution found")
 
 
 # Abbreviations

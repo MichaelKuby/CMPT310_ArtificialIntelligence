@@ -1,2 +1,0 @@
-# CMPT310_ArtificialIntelligence
- 
