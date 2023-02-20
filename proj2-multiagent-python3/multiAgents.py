@@ -286,39 +286,6 @@ def alphaBetaPruning(evalFunc, depth, alpha, beta, agentIndex, gameState):
         return(minimum, direction, alpha, beta)
 
 
-def alpha_max_value(evalFunc, depth, alpha, beta, agentIndex, successorStates):
-    successorValues = []
-    for state in successorStates:
-        nextState = state[0]
-        nextAction = state[1]
-        successorValues.append((alphaBetaPruning(evalFunc, depth, alpha, beta, agentIndex, nextState), nextAction))
-
-    max = None
-    for value in successorValues:
-        if max == None or max < value[0][0]:
-            max = value[0][0]
-            direction = value[1]
-            if max >= beta:
-                return (max, direction)
-            alpha = max(alpha, max)
-    return (max, direction)
-
-def alpha_min_value(evalFunc, depth, alpha, beta, agentIndex, successorStates):
-    successorValues = []
-    for state in successorStates:
-        nextState = state[0]
-        nextAction = state[1]
-        successorValues.append((alphaBetaPruning(evalFunc, depth, alpha, beta, agentIndex, nextState), nextAction))
-
-    min = None
-    direction = None
-    for value in successorValues:
-        if min == None or min > value[0][0]:
-            min = value[0][0]
-            direction = value[1]
-    return (min, direction)
-
-
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
@@ -331,19 +298,101 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        evalFunc = self.evaluationFunction
+        depth = self.depth
+        pacman = 0
 
+        res = expectimax(evalFunc, depth, pacman, gameState)
+        return res[1]
+
+def expectimax(evalFunc, depth, agentIndex, gameState):
+    if depth == 0 or gameState.isWin() or gameState.isLose():
+        val, action = evalFunc(gameState), Directions.STOP
+        return val, action
+
+    nextAgent = agentIndex + 1
+
+    if nextAgent == gameState.getNumAgents():
+        nextAgent = 0
+        depth -= 1
+
+    legalActions = gameState.getLegalActions(agentIndex)
+
+    if agentIndex == 0:
+        # Max player
+        maximum = None
+        direction = None
+        for action in legalActions:
+            next_state = gameState.generateSuccessor(agentIndex, action)
+            next_state_value = expectimax(evalFunc, depth, nextAgent, next_state)
+            if maximum == None or next_state_value[0] > maximum:
+                maximum = next_state_value[0]
+                direction = action
+        return maximum, direction
+    else:
+        # Chance node!
+        value = 0
+        direction = None
+        p = 1 / len(legalActions)
+        for action in legalActions:
+            next_state = gameState.generateSuccessor(agentIndex, action)
+            next_state_value = expectimax(evalFunc, depth, nextAgent, next_state)
+            value += p * next_state_value[0]
+        return value, direction
 
 def betterEvaluationFunction(currentGameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: Four functions were used:
+    1) Score of the current game state
+        This simplpy uses the inbuilt .getScore() function from the
+        current game state as a baseline evaluation.
+    2) Proximity to food
+        From the food list we look for the nearest dot. The closer it is, the better.
+        Since close dots are more valuable, score this as the inverse of the distance.
+    3) Proximity to a power pellet
+        Checks first to see if the ghosts are scared. If false, hunting down a power
+        pellet becomes very valuable.
+    4) Ghost hunting
+        Checks first to see if the ghosts are scared. If true, locations closer to
+        ghosts become very valuable.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Useful information you can extract from a GameState (pacman.py)
+    pacman_position = currentGameState.getPacmanPosition()  # The new position
+    food_list = currentGameState.getFood().asList()  # Map of the food in the new position
+    ghostStates = currentGameState.getGhostStates()  # Ghost states in the new position
+    newScaredTimes = [ghostState.scaredTimer for ghostState in
+                      ghostStates]  # ScaredTimees of ghosts in new position
+    ghost_positions = currentGameState.getGhostPositions()
+    power_pellet_positions = currentGameState.getCapsules()
+
+    # Feature 1: Score of the current game state
+    game_state_score = currentGameState.getScore()
+
+    # Feature 2: Proximity to food
+    food_score = 0
+    if food_list:
+        closest_food = min(food_list, key=lambda x: manhattanDistance(x, pacman_position))
+        food_score += 1 / (manhattanDistance(pacman_position, closest_food))
+
+    # Feature 3: Proximity to a power-pellet
+    power_pellet_score = 0
+    if max(newScaredTimes) == 0:
+        if power_pellet_positions:
+            closest_pellet = min(power_pellet_positions, key=lambda x: manhattanDistance(pacman_position, x))
+            power_pellet_score += 1 / manhattanDistance(closest_pellet, pacman_position)
+
+
+    # Feature 4: Ghost-hunting
+    ghost_hunter_score = 0
+    if min(newScaredTimes) > 0:
+        closest_ghost = min(ghost_positions, key=lambda x: manhattanDistance(x, pacman_position))
+        ghost_hunter_score += 1 / (manhattanDistance(pacman_position, closest_ghost))
+
+    return 5 * game_state_score + 3 * food_score + 200 * ghost_hunter_score + 225 * power_pellet_score
 
 
 # Abbreviation
