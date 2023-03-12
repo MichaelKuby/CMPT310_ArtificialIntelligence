@@ -65,15 +65,21 @@ class ValueIterationAgent(ValueEstimationAgent):
         # V_{k+1}(s) <- max_{a in actions} Sum_{s'} T(s,a,s') [R(s,a,s') + gamma V_k(s')]
 
         n = self.iterations
-        start_state = self.mdp.getStartState()
+        current_state = self.mdp.getStartState()
+        actions = self.mdp.getPossibleActions(current_state)
         states = self.mdp.getStates()
-        actions = self.mdp.getPossibleActions(start_state)
+        values = self.values
 
         while n >= 0:
-            for a in actions:
-                v = float('-inf')
-
-                for s in states
+            for act in actions:
+                val = float('-inf')
+                for s in states:
+                    nextState, probability = self.mdp.getTransitionStatesAndProbs(current_state, act)
+                    reward = self.mdp.getReward(current_state, act, s)
+                    Vk = values[nextState]
+                    action_value = probability * (reward + Vk)
+                    val = max(val, action_value)
+            n = n - 1
 
         return
 
