@@ -27,7 +27,6 @@
 
 
 import mdp, util
-import numpy as np
 
 from learningAgents import ValueEstimationAgent
 import collections
@@ -66,17 +65,20 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         n = self.iterations
         states = self.mdp.getStates()
-        values = self.values
 
-        while n >= 0:
+        for i in range(n):
+            temp = util.Counter()
+
             for state in states: # Considering every state
-                actions = mdp.getPossibleActions(state) # And every action from every state
+                actions = self.mdp.getPossibleActions(state) # And every action from every state
                 q_max = float('-inf')
+
                 for action in actions: # find the maximum Q-value over all the actions
-                    q_action = self.computeQValueFromValues(state, action)
-                    q_max = max(q_max, q_action)
-                values[state] = q_max
-            n = n - 1
+                    q_max = max(q_max, self.computeQValueFromValues(state, action))
+                    temp[state] = q_max
+
+            self.values = temp # update the values after each iteration
+
 
 
     def getValue(self, state):
@@ -91,9 +93,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
+
         transition_probabilities = self.mdp.getTransitionStatesAndProbs(state, action)
         value = 0
         gamma = self.discount
+
         for future in transition_probabilities:
             next_state = future[0]
             prob = future[1]
@@ -116,8 +120,10 @@ class ValueIterationAgent(ValueEstimationAgent):
         take_action = None
         q_action = float('-inf')
         actions = self.mdp.getPossibleActions(state)
+
         for act in actions:
             q_future = self.computeQValueFromValues(state, act)
+
             if q_future > q_action:
                 q_action = q_future
                 take_action = act
