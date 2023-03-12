@@ -72,15 +72,10 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         while n >= 0:
             for act in actions:
-                
                 sum = 0
                 transition_probabilities = self.mdp.getTransitionStatesAndProbs(current_state, act)
                 for future in transition_probabilities:
-                    next_state = future[0]
-                    prob = future[1]
-                    reward = self.mdp.getReward(current_state, act, next_state)
-                    V_k = values[next_state]
-                    sum = sum + prob * (reward + V_k)
+
                 val = max(val, action_value)
             n = n - 1
 
@@ -99,8 +94,17 @@ class ValueIterationAgent(ValueEstimationAgent):
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        transition_probabilities = self.mdp.getTransitionStatesAndProbs(state, action)
+        value = 0
+        gamma = self.discount
+        for future in transition_probabilities:
+            next_state = future[0]
+            prob = future[1]
+            reward = self.mdp.getReward(state, action, next_state)
+            V_k = self.values[next_state]
+            value = value + prob * (reward + (gamma * V_k))
+
+        return value
 
     def computeActionFromValues(self, state):
         """
