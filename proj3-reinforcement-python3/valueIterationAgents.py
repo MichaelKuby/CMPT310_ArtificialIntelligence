@@ -72,13 +72,16 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         while n >= 0:
             for act in actions:
-                val = float('-inf')
-                for s in states:
-                    nextState, probability = self.mdp.getTransitionStatesAndProbs(current_state, act)
-                    reward = self.mdp.getReward(current_state, act, s)
-                    Vk = values[nextState]
-                    action_value = probability * (reward + Vk)
-                    val = max(val, action_value)
+                
+                sum = 0
+                transition_probabilities = self.mdp.getTransitionStatesAndProbs(current_state, act)
+                for future in transition_probabilities:
+                    next_state = future[0]
+                    prob = future[1]
+                    reward = self.mdp.getReward(current_state, act, next_state)
+                    V_k = values[next_state]
+                    sum = sum + prob * (reward + V_k)
+                val = max(val, action_value)
             n = n - 1
 
         return
