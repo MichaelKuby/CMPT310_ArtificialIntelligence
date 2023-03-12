@@ -27,6 +27,7 @@
 
 
 import mdp, util
+import numpy as np
 
 from learningAgents import ValueEstimationAgent
 import collections
@@ -59,9 +60,26 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.values = util.Counter() # A Counter is a dict with default 0
         self.runValueIteration()
 
+    """def runValueIteration_aux(self, V, n):
+        if V[n] >= 0:
+            return V[n]
+        if self.mdp.isTerminal(self.mdp.getStartState)
+            V[n] = self.mdp
+            return"""
+
     def runValueIteration(self):
         # Write value iteration code here
-        "*** YOUR CODE HERE ***"
+        # V_{k+1}(s) <- max_{a in actions} Sum_{s'} T(s,a,s') [R(s,a,s') + gamma V_k(s')]
+
+        n = self.iterations
+        start_state = self.mdp.getStartState()
+        actions = self.mdp.getPossibleActions(start_state)
+        m = float('-inf')
+
+        for a in actions:
+            m = max(m, )
+
+        return #self.runValueIteration_aux(self, V, n)
 
 
     def getValue(self, state):
