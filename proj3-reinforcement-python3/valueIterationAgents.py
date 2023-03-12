@@ -65,21 +65,18 @@ class ValueIterationAgent(ValueEstimationAgent):
         # V_{k+1}(s) <- max_{a in actions} Sum_{s'} T(s,a,s') [R(s,a,s') + gamma V_k(s')]
 
         n = self.iterations
-        current_state = self.mdp.getStartState()
-        actions = self.mdp.getPossibleActions(current_state)
         states = self.mdp.getStates()
         values = self.values
 
         while n >= 0:
-            for act in actions:
-                sum = 0
-                transition_probabilities = self.mdp.getTransitionStatesAndProbs(current_state, act)
-                for future in transition_probabilities:
-
-                val = max(val, action_value)
+            for state in states: # Considering every state
+                actions = mdp.getPossibleActions(state) # And every action from every state
+                q_max = float('-inf')
+                for action in actions: # find the maximum Q-value over all the actions
+                    q_action = self.computeQValueFromValues(state, action)
+                    q_max = max(q_max, q_action)
+                values[state] = q_max
             n = n - 1
-
-        return
 
 
     def getValue(self, state):
