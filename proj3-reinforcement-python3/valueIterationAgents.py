@@ -11,7 +11,6 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
 # valueIterationAgents.py
 # -----------------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -26,7 +25,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-import mdp, util
+import mdp, util, random
 
 from learningAgents import ValueEstimationAgent
 import collections
@@ -168,7 +167,20 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
 
     def runValueIteration(self):
-        "*** YOUR CODE HERE ***"
+        # V_{k+1}(s) <- max_{a in actions} Sum_{s'} T(s,a,s') [R(s,a,s') + gamma V_k(s')]
+
+        states = self.mdp.getStates()
+        m = self.iterations
+        l = len(states)
+
+        for i in range(m):
+            state = states[i % l]
+            if not self.mdp.isTerminal(state):
+                actions = self.mdp.getPossibleActions(state)  # Every action from this state
+                q_max = float('-inf')
+                for action in actions:  # find the maximum Q-value over all the actions
+                    q_max = max(q_max, self.computeQValueFromValues(state, action))
+                self.values[state] = q_max  # update the values after each iteration
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
