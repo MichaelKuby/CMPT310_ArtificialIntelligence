@@ -113,13 +113,18 @@ class QLearningAgent(ReinforcementAgent):
           HINT: You might want to use util.flipCoin(prob)
           HINT: To pick randomly from a list, use random.choice(list)
         """
-        # Pick Action
-        legalActions = self.getLegalActions(state)
-        action = None
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
 
-        return action
+        # Pick Action
+        legal_actions = self.getLegalActions(state)
+        action = None
+        epsilon = self.epsilon
+
+        if len(legal_actions) == 0:
+            return action
+        elif flipCoin(epsilon):
+            return random.choice(legal_actions)
+        else:
+            return self.computeActionFromQValues(state)
 
 
     def update(self, state, action, nextState, reward):
@@ -201,8 +206,7 @@ class ApproximateQAgent(PacmanQAgent):
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
 
     def update(self, state, action, nextState, reward):
         """
