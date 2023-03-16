@@ -207,13 +207,20 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
 
+        # Multiplying two counters gives the dot product of their
+        # vectors where each unique label is a vector element.
+
+        weights = self.getWeights()
+        feature_vector = FeatureExtractor.getFeatures(state, action)
+
+        return weights * feature_vector
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        
 
     def final(self, state):
         "Called at the end of each game."

@@ -24,7 +24,7 @@ class FeatureExtractor:
           Usually, the count will just be 1.0 for
           indicator functions.
         """
-        util.raiseNotDefined()
+        return SimpleExtractor.getFeatures(state, action)
 
 class IdentityExtractor(FeatureExtractor):
     def getFeatures(self, state, action):
