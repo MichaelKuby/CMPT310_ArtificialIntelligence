@@ -211,7 +211,7 @@ class ApproximateQAgent(PacmanQAgent):
         # vectors where each unique label is a vector element.
 
         weights = self.getWeights()
-        feature_vector = FeatureExtractor.getFeatures(state, action)
+        feature_vector = self.featExtractor.getFeatures(state, action)
 
         return weights * feature_vector
 
@@ -220,7 +220,16 @@ class ApproximateQAgent(PacmanQAgent):
            Should update your weights based on transition
         """
 
-        
+        weights = self.getWeights()
+        discount = self.discount
+        alpha = self.alpha
+        next_state_value = self.getValue(nextState)
+        current_state_qvalue = self.getQValue(state, action)
+        difference = (reward + discount * next_state_value) - current_state_qvalue
+        feature_vector = self.featExtractor.getFeatures(state, action)
+
+        for k, v, k2, v2 in weights.items, feature_vector.items:
+            self.weights[k] = v + (alpha * difference * v2)
 
     def final(self, state):
         "Called at the end of each game."
