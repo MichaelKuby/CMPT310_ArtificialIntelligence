@@ -336,9 +336,17 @@ class ExactInference(InferenceModule):
         The transition model is not entirely stationary: it may depend on
         Pacman's current position. However, this is not a problem, as Pacman's
         current position is known.
+
+        Passage of Time: B'(X_{t+1}) = sum_x_t P(X_{t+1} | x_t) * B(x_t)
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        beliefs = self.getBeliefDistribution()
+        positions = self.allPositions
+
+        for oldPos in positions:
+            if beliefs[oldPos] > 0:
+                newPosDist = self.getPositionDistribution(gameState, oldPos)
+                for p in newPosDist:
+                    beliefs[p] = newPosDist[p] * beliefs[oldPos]
 
     def getBeliefDistribution(self):
         return self.beliefs
