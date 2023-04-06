@@ -74,8 +74,12 @@ class DiscreteDistribution(dict):
         >>> empty
         {}
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        if len(self.keys()) == 0:
+            return
+        summation = self.total()
+        for k, v in self.items():
+            self[k] = v / summation
 
     def sample(self):
         """
@@ -98,8 +102,22 @@ class DiscreteDistribution(dict):
         >>> round(samples.count('d') * 1.0/N, 1)
         0.0
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # Normalize to bring values in range [0, 1)
+        self.normalize()
+
+        # sample a number between [0-1)
+        num = random.random()
+        value = 0.0
+        key = None
+
+        # Get the key that falls into the correct probability range
+        for k, v in self.items():
+            if value > num:
+                break
+            value = value + v
+            key = k
+
+        return key
 
 
 class InferenceModule:
@@ -167,6 +185,7 @@ class InferenceModule:
     def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition):
         """
         Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
+        noisyDistance is our observation, a noisy rading of the distance to the ghost
         """
         "*** YOUR CODE HERE ***"
         raiseNotDefined()
