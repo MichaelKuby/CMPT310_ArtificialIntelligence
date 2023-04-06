@@ -79,7 +79,8 @@ class DiscreteDistribution(dict):
             return
         summation = self.total()
         for k, v in self.items():
-            self[k] = v / summation
+            if summation != 0:
+                self[k] = v / summation
 
     def sample(self):
         """
@@ -185,10 +186,25 @@ class InferenceModule:
     def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition):
         """
         Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
-        noisyDistance is our observation, a noisy rading of the distance to the ghost
+        noisyDistance is our observation, a noisy reading of the distance to the ghost
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        if noisyDistance is None:
+            if ghostPosition == jailPosition:
+                return float(1.0)
+            else:
+                return float(0.0)
+
+        if ghostPosition == jailPosition:
+            if noisyDistance is None:
+                return float(1.0)
+            else:
+                return float(0.0)
+
+        trueDistance = manhattanDistance(pacmanPosition, ghostPosition)
+        P = busters.getObservationProbability(noisyDistance, trueDistance)
+
+        return P
 
     def setGhostPosition(self, gameState, ghostPosition, index):
         """
@@ -294,9 +310,21 @@ class ExactInference(InferenceModule):
         The update model is not entirely stationary: it may depend on Pacman's
         current position. However, this is not a problem, as Pacman's current
         position is known.
+
+        Use: getObservationProb(noisyDistance, pacmanPosition, ghostPosition, jailPosition)
+
+        Compute P(X_{t+1} | e_{1:t+1}) proportional to P(e_{t+1} | X_{t+1}) * B'(X_{t+1})
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        beliefs = self.beliefs
+        positions = self.allPositions # ghost positions
+        noisyDistance = observation
+        pacmanPosition = gameState.getPacmanPosition()
+        jailPosition = self.getJailPosition()
+
+        for ghostPosition in positions:
+            P = self.getObservationProb(noisyDistance, pacmanPosition, ghostPosition, jailPosition)
+            beliefs[ghostPosition] = P * beliefs[ghostPosition]
 
         self.beliefs.normalize()
 
