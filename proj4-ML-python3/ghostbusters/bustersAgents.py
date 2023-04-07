@@ -145,10 +145,11 @@ class GreedyBustersAgent(BustersAgent):
              if livingGhosts[i+1]]
 
         closestGhostPositions = util.Counter()
-        # The most likely position of each ghost that has not yet been captured
+        # Each Ghost has its own distribution
         for ghostDist in livingGhostPositionDistributions:
             mostLikelyProbability = float('-inf')
             mostLikelyPosition = None
+            # Find the position with the highest probability
             for pos, prob in ghostDist.items():
                 if prob > mostLikelyProbability:
                     mostLikelyProbability = prob
@@ -157,6 +158,7 @@ class GreedyBustersAgent(BustersAgent):
 
         smallestDistanceAfterAction = float('inf')
         actionToTake = None
+        # Check which action brings us closest to a ghost
         for action in legalPacmanActions:
             successorPosition = Actions.getSuccessor(pacmanPosition, action)
             for position, probability in closestGhostPositions.items():
