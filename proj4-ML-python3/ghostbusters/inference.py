@@ -16,6 +16,7 @@ import itertools
 import random
 import busters
 import game
+import util
 
 from util import manhattanDistance, raiseNotDefined
 
@@ -341,12 +342,15 @@ class ExactInference(InferenceModule):
         """
         beliefs = self.getBeliefDistribution()
         positions = self.allPositions
+        newBeliefs = util.Counter()
 
         for oldPos in positions:
-            if beliefs[oldPos] > 0:
-                newPosDist = self.getPositionDistribution(gameState, oldPos)
-                for p in newPosDist:
-                    beliefs[p] = newPosDist[p] * beliefs[oldPos]
+            newPosDist = self.getPositionDistribution(gameState, oldPos)
+            for newPos in newPosDist:
+                prob = newPosDist[newPos]
+                newBeliefs[newPos] += prob * beliefs[oldPos]
+
+        self.beliefs = newBeliefs
 
     def getBeliefDistribution(self):
         return self.beliefs
