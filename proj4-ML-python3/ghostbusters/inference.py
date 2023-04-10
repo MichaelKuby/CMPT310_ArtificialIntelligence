@@ -554,7 +554,7 @@ class JointParticleFilter(ParticleFilter):
             for i in range(self.numGhosts):
                 newPosDist = self.getPositionDistribution(gameState, oldParticle, i, self.ghostAgents[i])
                 newParticle[i] = newPosDist.sample()
-        
+
             newParticles.append(tuple(newParticle))
         self.particles = newParticles
 
